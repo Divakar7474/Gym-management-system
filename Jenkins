@@ -51,18 +51,17 @@ pipeline {
         }
         stage('Push to Docker Hub') {
             environment {
-                DOCKER_HUB_USER = credentials('docker-hub-username') // Jenkins credentials ID for Docker username
-                DOCKER_HUB_PASS = credentials('docker-hub-password') // Jenkins credentials ID for Docker password
+                DOCKER_CREDENTIALS = credentials('docker-hub-credentials') // Jenkins credentials ID
             }
             steps {
                 echo 'Pushing Docker Image to Docker Hub'
                 bat '''
-                REM Log in to Docker Hub
-                echo %DOCKER_HUB_PASS% | docker login -u %DOCKER_HUB_USER% --password-stdin
+                REM Log in to Docker Hub using credentials
+                docker login -u %DOCKER_CREDENTIALS_USR% -p %DOCKER_CREDENTIALS_PSW%
                 
                 REM Tag and push the Docker image
-                docker tag gym-management-system:latest %DOCKER_HUB_USER%/gym-management-system:latest
-                docker push %DOCKER_HUB_USER%/gym-management-system:latest
+                docker tag gym-management-system:latest %DOCKER_CREDENTIALS_USR%/gym-management-system:latest
+                docker push %DOCKER_CREDENTIALS_USR%/gym-management-system:latest
                 '''
             }
         }
