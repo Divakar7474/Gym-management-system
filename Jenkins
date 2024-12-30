@@ -57,7 +57,7 @@ pipeline {
                 echo 'Pushing Docker Image to Docker Hub'
                 bat '''
                 REM Log in to Docker Hub
-                echo %DOCKER_HUB_USER_PSW% | docker login -u %DOCKER_HUB_USER_USR% --password-stdin
+                docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%
                 
                 REM Tag and push the Docker image
                 docker tag gym-management-system:latest %DOCKER_HUB_USER_USR%/gym-management-system:latest
