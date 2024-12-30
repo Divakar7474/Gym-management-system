@@ -8,19 +8,26 @@ pipeline {
         }
         stage('Install Dependencies') {
             steps {
-                sh 'sudo apt update && sudo apt install php php-mysql -y'
+                bat '''
+                echo Installing PHP dependencies...
+                REM Add any necessary PHP or Composer commands here.
+                '''
             }
         }
         stage('Run Tests') {
             steps {
-                // Add PHP or MySQL tests here
-                echo 'Tests executed successfully.'
+                bat '''
+                echo Running tests...
+                REM Add your PHP test scripts or commands here.
+                '''
             }
         }
         stage('Deploy Application') {
             steps {
-                // Define deployment steps here
-                echo 'Application deployed successfully.'
+                bat '''
+                echo Deploying application...
+                REM Add deployment steps here, like copying files to a web server directory.
+                '''
             }
         }
     }
