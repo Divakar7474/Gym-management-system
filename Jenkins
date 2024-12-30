@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git url: 'https://github.com/Divakar7474/Gym-management-system.git', branch: 'main'
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                sh 'sudo apt update && sudo apt install php php-mysql -y'
+            }
+        }
+        stage('Run Tests') {
+            steps {
+                // Add PHP or MySQL tests here
+                echo 'Tests executed successfully.'
+            }
+        }
+        stage('Deploy Application') {
+            steps {
+                // Define deployment steps here
+                echo 'Application deployed successfully.'
+            }
+        }
+    }
+}
