@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                // Clone the repository from GitHub
+                echo 'Cloning Repository'
                 git branch: 'main', url: 'https://github.com/Divakar7474/Gym-management-system.git'
             }
         }
@@ -37,6 +37,34 @@ pipeline {
                 '''
             }
         }
+        stage('Build Docker Image') {
+            steps {
+                echo 'Building Docker Image'
+                bat '''
+                REM Ensure Docker is installed and running
+                docker --version
+                
+                REM Build the Docker image
+                docker build -t gym-management-system:latest .
+                '''
+            }
+        }
+        stage('Push to Docker Hub') {
+            environment {
+                DOCKER_HUB_USER = credentials('docker-hub-credentials') // Jenkins credentials ID
+            }
+            steps {
+                echo 'Pushing Docker Image to Docker Hub'
+                bat '''
+                REM Log in to Docker Hub
+                echo %DOCKER_HUB_USER_PSW% | docker login -u %DOCKER_HUB_USER_USR% --password-stdin
+                
+                REM Tag and push the Docker image
+                docker tag gym-management-system:latest %DOCKER_HUB_USER_USR%/gym-management-system:latest
+                docker push %DOCKER_HUB_USER_USR%/gym-management-system:latest
+                '''
+            }
+        }
         stage('Deploy Application') {
             steps {
                 echo 'Deploying Application'
@@ -49,7 +77,7 @@ pipeline {
     }
     post {
         success {
-            echo 'Build and Deployment successful!'
+            echo 'Build, Containerization, and Deployment Successful!'
         }
         failure {
             echo 'Build or Deployment failed. Check logs.'
