@@ -9,26 +9,39 @@ pipeline {
         }
         stage('Install Dependencies') {
             steps {
-                // Install PHP and necessary extensions
-                echo 'Installing PHP dependencies'
+                echo 'Installing PHP and Enabling mysqli Extension'
                 bat '''
-                choco install php -y
+                REM Install PHP if not installed
+                choco install php -y || echo "PHP is already installed"
+                
+                REM Check and enable mysqli extension
                 php -r "if (!extension_loaded('mysqli')) exit(1);"
+                if %ERRORLEVEL% neq 0 (
+                    echo Enabling mysqli extension...
+                    for %%F in ("php.ini", "C:\\tools\\php\\php.ini") do (
+                        findstr /C:"extension=mysqli" "%%F" > nul || (
+                            echo Updating %%F to enable mysqli...
+                            echo extension=mysqli >> "%%F"
+                        )
+                    )
+                )
                 '''
             }
         }
         stage('Run Tests') {
             steps {
-                // Run unit tests (if applicable)
                 echo 'Running Tests'
-                bat 'php -l index.php' // Example: Syntax check on a PHP file
+                bat '''
+                REM Perform basic PHP syntax check
+                php -l index.php
+                '''
             }
         }
         stage('Deploy Application') {
             steps {
                 echo 'Deploying Application'
                 bat '''
-                REM Deploy files to web server directory
+                REM Deploy application to IIS web root
                 xcopy /E /I /Y .\\* "C:\\inetpub\\wwwroot\\GymManagementSystem\\"
                 '''
             }
@@ -39,7 +52,7 @@ pipeline {
             echo 'Build and Deployment successful!'
         }
         failure {
-            echo 'Build or Deployment failed. Check the logs.'
+            echo 'Build or Deployment failed. Check logs.'
         }
     }
 }
